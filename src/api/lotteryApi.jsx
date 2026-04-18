@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "http://localhost:8000";
 
 export async function uploadCsv(file, maxWinners) {
   const formData = new FormData();

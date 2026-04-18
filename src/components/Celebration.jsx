@@ -35,7 +35,7 @@ export default function Celebration({ winner, onNext }) {
 
 
   <div className="text-8xl font-extrabold text-yellow-300 tracking-widest relative z-10">
-    {winner}
+    {winner.number}
   </div>
 
   <p className="text-gray-300 mt-4">
