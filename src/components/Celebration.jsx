@@ -28,16 +28,24 @@ export default function Celebration({ winner, onNext }) {
  {/* 🏆 CENTER WINNER */}
 <div className="text-center z-20 relative">
 
-  <h1 className="text-4xl text-green-400 font-bold mb-4">
+  <h1 className="text-4xl text-yellow-400 font-bold mb-4">
     🎉🏆 WINNER SELECTED 🏆🎉
   </h1>
 
 
 
-  <div className="text-8xl font-extrabold text-yellow-300 tracking-widest relative z-10">
+  <div className="text-8xl font-extrabold text-cyan-300 tracking-widest relative z-10">
     {winner.number}
   </div>
-
+ <div className="text-4xl font-extrabold text-yellow-400 tracking-widest relative z-10">
+    {winner.customerName}
+  </div>
+   <div className="text-4xl font-extrabold text-yellow-400 tracking-widest relative z-10">
+    {winner.customerBranch}
+  </div>
+   <div className="text-4xl font-extrabold text-yellow-400 tracking-widest relative z-10">
+    {winner.branchLocation}
+  </div>
   <p className="text-gray-300 mt-4">
     ⚽ World Cup Experience Package ⚽
   </p>
@@ -172,7 +180,7 @@ export default function Celebration({ winner, onNext }) {
       {/* NEXT BUTTON */}
       <button
         onClick={onNext}
-        className="absolute bottom-10 bg-green-500 text-black px-8 py-3 rounded-full font-bold z-30"
+        className="absolute bottom-10 bg-cyan-500 text-black px-8 py-3 rounded-full font-bold z-30"
       >
         ➡ Next Draw
       </button>

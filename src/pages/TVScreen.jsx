@@ -116,7 +116,7 @@ export default function TVScreen() {
     <div className="min-h-screen bg-black text-white flex flex-col overflow-hidden">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-3 bg-gray-950 border-b border-yellow-500">
+      <div className="flex items-center justify-between px-6 py-3 bg-gray-950 border-b border-cyan-500">
 
         <img src="/logos/visa.png" className="h-10 object-contain" />
 
@@ -139,7 +139,7 @@ export default function TVScreen() {
         {/* NUMBER DISPLAY */}
         <motion.div
           animate={{ scale: step === "SPINNING" ? 1.2 : 1 }}
-          className="text-7xl font-bold text-yellow-300 mb-10 tracking-widest"
+          className="text-7xl font-bold text-cyan-400 mb-10 tracking-widest"
         >
           {display}
         </motion.div>
@@ -175,7 +175,7 @@ export default function TVScreen() {
               className="bg-gray-900 p-2 flex justify-between"
             >
               <span>Draw #{h.id}</span>
-              <span className="text-yellow-300">{h.number}</span>
+              <span className="text-cyan-300">{h.number}</span>
             </div>
           ))}
         </div>

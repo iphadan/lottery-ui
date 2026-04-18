@@ -3,6 +3,7 @@ import {
   uploadCsv,
   getActiveSession,
   closeSession,
+  getResults,
 } from "../api/lotteryApi";
 
 export default function AdminPage() {
@@ -10,8 +11,9 @@ export default function AdminPage() {
   const [maxWinners, setMaxWinners] = useState(5);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(false);
-const [message, setMessage] = useState(null);
-  // 🔄 load active session on page load
+  const [message, setMessage] = useState(null);
+  const [winners, setWinners] = useState([]);
+
   useEffect(() => {
     loadSession();
   }, []);
@@ -19,7 +21,21 @@ const [message, setMessage] = useState(null);
   const loadSession = async () => {
     const data = await getActiveSession();
     setSession(data);
+
+    if (data?.id) {
+      loadWinners(data.id);
+    }
   };
+const loadWinners = async (sessionId) => {
+  try {
+    const data = await getResults(sessionId);
+
+
+    setWinners(data || []);
+  } catch (e) {
+    console.error("Failed to load winners", e);
+  }
+};
 
   const handleUpload = async () => {
     if (!file) {
@@ -42,93 +58,146 @@ const [message, setMessage] = useState(null);
   const handleClose = async () => {
     await closeSession();
     setSession(null);
+    setWinners([]);
     setMessage({ type: "success", text: "Session closed" });
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen bg-gray-950 text-white">
 
-      <h1 className="text-2xl font-bold mb-6">
-        🧑‍💼 Admin Panel
-      </h1>
+      {/* 🔵 HEADER */}
+      <div className="flex items-center justify-between px-6 py-4 bg-black border-b border-cyan-500">
 
-      {/* UPLOAD */}
-      <div className="bg-gray-800 p-6 rounded mb-6">
-        <h2 className="text-lg mb-4">Upload Lottery CSV</h2>
+        <img src="/logos/visa.png" className="h-10" />
 
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
-          className="mb-3"
-        />
+        <div className="flex items-center gap-4">
+          <img src="/logos/usa-header.png" className="h-10" />
+          <img src="/logos/mexico-header.webp" className="h-10" />
+          <img src="/logos/canada-header.webp" className="h-10" />
+        </div>
 
-        <div className="mb-3">
-          <label>Max Winners:</label>
+        <img src="/logos/cooperative.png" className="h-10" />
+      </div>
+
+      {/* MESSAGE */}
+      {message && (
+        <div
+          className={`p-3 text-center ${
+            message.type === "error"
+              ? "bg-red-500"
+              : "bg-cyan-600"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
+      <div className="p-8 grid grid-cols-3 gap-6">
+
+        {/* 📤 UPLOAD PANEL */}
+        <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
+          <h2 className="text-lg font-bold mb-4 text-cyan-400">
+            Upload Lottery CSV
+          </h2>
+
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="mb-4"
+          />
+
+          <label className="block mb-2 text-sm">Max Winners</label>
           <input
             type="number"
             value={maxWinners}
-            onChange={(e) => setMaxWinners(e.target.value)}
-            className="ml-2 text-black px-2"
+            onChange={(e) => setMaxWinners(Number(e.target.value))}
+            className="w-full p-2 text-black rounded"
           />
+
+          <button
+            onClick={handleUpload}
+            disabled={loading}
+            className="mt-4 w-full bg-cyan-500 text-black py-2 rounded font-bold"
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
         </div>
 
-        <button
-          onClick={handleUpload}
-          disabled={loading}
-          className="bg-blue-500 px-4 py-2 rounded"
-        >
-          {loading ? "Uploading..." : "Upload"}
-        </button>
-      </div>
+        {/* 📊 SESSION INFO */}
+        <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
+          <h2 className="text-lg font-bold mb-4 text-cyan-400">
+            Active Session
+          </h2>
 
-      {/* SESSION INFO */}
-      <div className="bg-gray-800 p-6 rounded">
+          {session ? (
+            <div className="space-y-2 text-sm">
+              <p>ID: {session.id}</p>
+              <p>Status: {session.status}</p>
+              <p>Max Winners: {session.maxWinners}</p>
+              <p>
+                Remaining:{" "}
+                {session.maxWinners - (session.drawnCount || 0)}
+              </p>
 
-        <h2 className="text-lg mb-4">Active Session</h2>
+              <button
+                onClick={handleClose}
+                className="mt-4 bg-red-500 px-4 py-2 rounded w-full"
+              >
+                Close Session
+              </button>
+            </div>
+          ) : (
+            <p className="text-gray-400">No active session</p>
+          )}
+        </div>
 
-        {session ? (
-          <>
-            <p><strong>ID:</strong> {session.id}</p>
-            <p><strong>Status:</strong> {session.status}</p>
-            <p><strong>Message:</strong> {session.message}</p>
-            <p><strong>Max Winners:</strong> {session.maxWinners}</p>
+        {/* 🏆 WINNERS PANEL */}
+        <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
+          <h2 className="text-lg font-bold mb-4 text-cyan-400">
+            Winners (Live)
+          </h2>
 
-            <button
-              onClick={handleClose}
-              className="mt-4 bg-red-500 px-4 py-2 rounded"
-            >
-              Close Session
-            </button>
-          </>
-        ) : (
-          <p>No active session</p>
-        )}
-
-        {session && (
-  <div className="bg-gray-800 p-6 rounded mt-6">
-
-    <h2 className="text-lg mb-4">📊 Draw Pool Summary</h2>
-
-    <div className="grid grid-cols-2 gap-4 text-sm">
-
-      <p><strong>File:</strong> {session.fileName}</p>
-
-      <p><strong>Total Records:</strong> {session.totalRecords}</p>
-      <p><strong>Unique Numbers:</strong> {session.uniqueNumbers}</p>
-
-      <p><strong>Duplicates:</strong> {session.duplicateCount}</p>
-      <p><strong>Number Length:</strong> {session.numberLength}</p>
-
-      <p><strong>Draw Count:</strong> {session.drawnCount}</p>
-
-      <p><strong>Max Winners:</strong> {session.maxWinners}</p>
-      <p><strong>Remaining:</strong> {session.maxWinners - session.drawnCount}</p>
-
-    </div>
-
+          {winners.length === 0 ? (
+            <p className="text-gray-400">No winners yet</p>
+          ) : (
+            <div className="space-y-2 max-h-96 overflow-auto">
+           {winners.map((w) => (
+  <div
+    key={w.id}
+    className="bg-black p-2 rounded flex justify-between border border-cyan-800"
+  >
+    <span>{w.lotteryNumber.number}</span>
+    <span className="text-cyan-400">
+      {w.lotteryNumber.customerName}
+    </span>
   </div>
-)}
+))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* 📊 DRAW POOL */}
+      {session && (
+        <div className="px-8 pb-8">
+          <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
+            <h2 className="text-lg font-bold mb-4 text-cyan-400">
+              Draw Pool Summary
+            </h2>
+
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <p>File: {session.fileName}</p>
+              <p>Total: {session.totalRecords}</p>
+              <p>Unique: {session.uniqueNumbers}</p>
+              <p>Duplicates: {session.duplicateCount}</p>
+              <p>Drawn: {session.drawnCount}</p>
+              <p>
+                Remaining: {session.maxWinners - session.drawnCount}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
