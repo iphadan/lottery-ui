@@ -18,6 +18,11 @@ export async function getActiveSession() {
   return res.json();
 }
 
+export async function getAllSessions() {
+  const res = await fetch(`${BASE_URL}/api/session/all`);
+  return res.json();
+}
+
 export async function drawWinner() {
   const res = await fetch(`${BASE_URL}/api/draw/winner`, {
     method: "POST",
@@ -27,6 +32,11 @@ export async function drawWinner() {
 
 export async function getResults(sessionId) {
   const res = await fetch(`${BASE_URL}/api/results/session/${sessionId}`);
+  return res.json();
+}
+
+export async function loadSessionPool(sessionId) {
+  const res = await fetch(`${BASE_URL}/api/draw/${sessionId}`);
   return res.json();
 }
 

@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Celebration from "../components/Celebration";
-import { drawWinner, getActiveSession } from "../api/lotteryApi";
+import {
+  drawWinner,
+  getActiveSession,
+  getResults,
+} from "../api/lotteryApi";
 
 export default function TVScreen() {
-
   const [session, setSession] = useState(null);
 
   const [step, setStep] = useState("IDLE");
@@ -13,99 +16,132 @@ export default function TVScreen() {
   const [history, setHistory] = useState([]);
   const [count, setCount] = useState(0);
 
-  // 🔄 LOAD ACTIVE SESSION
+  // 🔄 LOAD SESSION + HISTORY
   useEffect(() => {
-    const loadSession = async () => {
+    const load = async () => {
       try {
-        const data = await getActiveSession();
-        setSession(data);
+        const s = await getActiveSession();
+        setSession(s);
+
+        if (s?.id) {
+          const results = await getResults(s.id);
+
+          const formatted = results.map((r, i) => ({
+            id: i + 1,
+            number: r.lotteryNumber.number,
+          }));
+
+          setHistory(formatted);
+          setCount(formatted.length);
+        }
       } catch (e) {
-        console.error("Failed to load session");
+        console.error("Init failed");
       }
     };
 
-    loadSession();
+    load();
   }, []);
 
-  // ❌ NO SESSION UI
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <h1 className="text-2xl text-red-400">
-          ⚠ No Active Lottery Session
-        </h1>
+        ⚠ No Active Session
       </div>
     );
   }
 
   const maxWinners = session.maxWinners;
 
-  // 🎯 START DRAW
+  // 🎯 DRAMATIC DRAW
   const startDraw = async () => {
     if (step !== "IDLE" || count >= maxWinners) return;
 
     setStep("SPINNING");
 
-    // 🎰 spinning effect
+    let speed = 40;
+
     let interval = setInterval(() => {
       setDisplay(
         Math.floor(100000000000 + Math.random() * 900000000000).toString()
       );
-    }, 50);
+    }, speed);
 
     try {
-      // 🔥 CALL BACKEND IMMEDIATELY
       const data = await drawWinner();
+      if (!data?.number) {
+if (data?.status === 202) {
+setDisplay("No Active Session Found");}
+else{
+    setDisplay("Error Occurred");
+}
 
-      clearInterval(interval);
 
+
+        clearInterval(interval);
+        setStep("IDLE");
+        return;
+
+
+      }
       const realNumber = data.number.toString();
+
       setWinner(data);
 
-      setStep("REVEAL");
+      // ⏳ SLOW DOWN EFFECT
+      let slowdown = 0;
 
-      // 🎬 DIGIT REVEAL ANIMATION
-      let current = "";
-      let index = 0;
+      const slowInterval = setInterval(() => {
+        slowdown += 1;
 
-      const revealInterval = setInterval(() => {
-        current += realNumber[index];
-        index++;
+        if (slowdown > 10) {
+          clearInterval(interval);
+          clearInterval(slowInterval);
 
-        setDisplay(
-          current + "_".repeat(realNumber.length - current.length)
-        );
+          // 🎬 REVEAL DIGITS ONE BY ONE
+          setStep("REVEAL");
 
-        if (index === realNumber.length) {
-          clearInterval(revealInterval);
+          let current = "";
+          let index = 0;
 
-          setTimeout(() => {
-            setDisplay(realNumber);
+          const reveal = setInterval(() => {
+            current += realNumber[index];
+            index++;
 
-            setHistory((h) => [
-              ...h,
-              {
-                id: count + 1,
-                number: realNumber,
-              },
-            ]);
+            setDisplay(
+              current +
+                Math.floor(
+                  Math.random() *
+                    Math.pow(10, realNumber.length - current.length)
+                )
+                  .toString()
+                  .padStart(realNumber.length - current.length, "0")
+            );
 
-            setStep("CELEBRATION");
-          }, 500);
+            if (index === realNumber.length) {
+              clearInterval(reveal);
+
+              setTimeout(() => {
+                setDisplay(realNumber);
+
+                setHistory((h) => [
+                  ...h,
+                  { id: count + 1, number: realNumber },
+                ]);
+
+                setStep("CELEBRATION");
+              }, 600);
+            }
+          }, 250);
         }
-      }, 200);
-
-    } catch (err) {
+      }, 150);
+    } catch (e) {
       clearInterval(interval);
-      console.error(err);
+      console.error(e);
       setStep("IDLE");
     }
   };
 
-  // ➡ NEXT DRAW
   const nextDraw = () => {
-    if (step !== "CELEBRATION") return;
-
     setStep("IDLE");
     setWinner(null);
     setDisplay("------------");
@@ -113,69 +149,69 @@ export default function TVScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-black text-white flex flex-col">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-3 bg-gray-950 border-b border-cyan-500">
+      <div className="flex items-center justify-between px-6 py-3 bg-black border-b border-cyan-500 shadow-lg">
+<link rel="icon" href="/favicon.ico" />
+        <img src="/logos/visa.png" className="h-10" />
 
-        <img src="/logos/visa.png" className="h-10 object-contain" />
-
-        <div className="flex items-center gap-4">
+        <div className="flex gap-4">
           <img src="/logos/usa-header.png" className="h-10" />
           <img src="/logos/mexico-header.webp" className="h-10" />
           <img src="/logos/canada-header.webp" className="h-10" />
         </div>
 
-        <img src="/logos/cooperative.png" className="h-10 object-contain" />
+        <img src="/logos/cooperative.png" className="h-10" />
       </div>
 
       {/* STAGE */}
       <div className="flex-1 flex flex-col items-center justify-center">
 
-        <div className="text-lg mb-4 text-gray-400">
-          Draw {count + 1} / {maxWinners}
-        </div>
+        <div className="text-cyan-400 mb-4">
+          Draw {count } / {maxWinners}
 
-        {/* NUMBER DISPLAY */}
+
+        </div>
+       {count === maxWinners &&
+  <span className="text-red-500 ml-4">MAX WINNERS REACHED</span>
+}
+        {/* NUMBER */}
         <motion.div
-          animate={{ scale: step === "SPINNING" ? 1.2 : 1 }}
-          className="text-7xl font-bold text-cyan-400 mb-10 tracking-widest"
+          animate={{ scale: step === "SPINNING" ? 1.15 : 1 }}
+          className="text-7xl font-bold tracking-widest mb-10 text-cyan-400"
         >
           {display}
         </motion.div>
 
-        {/* START BUTTON */}
+        {/* BUTTON */}
         <button
           onClick={startDraw}
           disabled={step !== "IDLE" || count >= maxWinners}
-          className="bg-yellow-500 text-black px-10 py-4 rounded-full text-2xl font-bold disabled:opacity-40"
+          className="bg-green-500 text-black px-10 py-4 rounded-full text-2xl font-bold disabled:opacity-40 hover:scale-105 transition"
         >
-          {step === "SPINNING"
-            ? "🎲 Drawing..."
-            : step === "REVEAL"
-            ? "🔢 Revealing..."
-            : "🎯 START DRAW"}
+          🎯 START DRAW
         </button>
 
-        {/* NEXT BUTTON */}
+        {/* NEXT */}
         {step === "CELEBRATION" && count < maxWinners - 1 && (
           <button
             onClick={nextDraw}
-            className="mt-6 bg-green-500 text-black px-8 py-3 rounded-full font-bold"
+            className="mt-6 bg-cyan-500 text-black px-8 py-3 rounded-full font-bold"
           >
             ➡ NEXT DRAW
           </button>
         )}
 
         {/* HISTORY */}
-        <div className="mt-10 space-y-2 w-80">
+        <div className="mt-10 w-96 space-y-2">
           {history.map((h) => (
             <div
               key={h.id}
-              className="bg-gray-900 p-2 flex justify-between"
+              className="bg-gray-900 border border-cyan-700 p-2 flex justify-between"
             >
-              <span>Draw #{h.id}</span>
-              <span className="text-cyan-300">{h.number}</span>
+              <span>#{h.id}</span>
+              <span className="text-green-400">{h.number}</span>
             </div>
           ))}
         </div>
