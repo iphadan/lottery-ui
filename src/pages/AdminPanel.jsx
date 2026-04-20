@@ -19,7 +19,7 @@ export default function AdminPage() {
 
   const [sessions, setSessions] = useState([]);
   const [selectedSessionId, setSelectedSessionId] = useState(null);
-  
+
   const [selectedWinners, setSelectedWinners] = useState([]);
 
   const [pool, setPool] = useState([]);
@@ -29,6 +29,9 @@ export default function AdminPage() {
     loadSession();
     loadAllSessions();
   }, []);
+
+
+  
 
   // 🔄 ACTIVE SESSION
   const loadSession = async () => {
