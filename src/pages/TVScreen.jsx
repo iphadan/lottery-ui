@@ -154,21 +154,21 @@ else{
       {/* HEADER */}
       <div className="flex items-center justify-between px-6 py-3 bg-black border-b border-cyan-500 shadow-lg">
 <link rel="icon" href="/favicon.ico" />
-        <img src="/logos/visa.png" className="h-10" />
+                <img src="/logos/cooperative.png" className="h-12" />
+
 
         <div className="flex gap-4">
-          <img src="/logos/usa-header.png" className="h-10" />
-          <img src="/logos/mexico-header.webp" className="h-10" />
-          <img src="/logos/canada-header.webp" className="h-10" />
+          <img src="/logos/usa-header-trans.png" className="h-12" />
+          <img src="/logos/mexico-header.webp" className="h-12" />
+          <img src="/logos/canada-header-trans.png" className="h-12" />
         </div>
-
-        <img src="/logos/cooperative.png" className="h-10" />
+<img src="/logos/visa.webp" className="h-12" />
       </div>
 
       {/* STAGE */}
       <div className="flex-1 flex flex-col items-center justify-center">
 
-        <div className="text-cyan-400 mb-4">
+        <div className="text-cyan-500 mb-4 border-cyan-700 border px-4 py-1 rounded-full font-mono">
           Draw {count } / {maxWinners}
 
 
@@ -188,7 +188,7 @@ else{
         <button
           onClick={startDraw}
           disabled={step !== "IDLE" || count >= maxWinners}
-          className="bg-green-500 text-black px-10 py-4 rounded-full text-2xl font-bold disabled:opacity-40 hover:scale-105 transition"
+          className="bg-cyan-500 text-black px-10 py-4 rounded-full text-2xl font-bold disabled:opacity-40 hover:scale-105 transition"
         >
           🎯 START DRAW
         </button>
@@ -197,7 +197,7 @@ else{
         {step === "CELEBRATION" && count < maxWinners - 1 && (
           <button
             onClick={nextDraw}
-            className="mt-6 bg-cyan-500 text-black px-8 py-3 rounded-full font-bold"
+            className="mt-6 bg-cyan-700 text-black px-8 py-3 rounded-full font-bold"
           >
             ➡ NEXT DRAW
           </button>
@@ -211,7 +211,7 @@ else{
               className="bg-gray-900 border border-cyan-700 p-2 flex justify-between"
             >
               <span>#{h.id}</span>
-              <span className="text-green-400">{h.number}</span>
+              <span className="text-cyan-500">{h.number}</span>
             </div>
           ))}
         </div>
