@@ -58,46 +58,35 @@ export default function TVScreen() {
 
     setStep("SPINNING");
 
-    let speed = 40;
-
     let interval = setInterval(() => {
       setDisplay(
         Math.floor(100000000000 + Math.random() * 900000000000).toString()
       );
-    }, speed);
+    }, 40);
 
     try {
       const data = await drawWinner();
+
       if (!data?.number) {
-if (data?.status === 202) {
-setDisplay("No Active Session Found");}
-else{
-    setDisplay("Error Occurred");
-}
-
-
-
         clearInterval(interval);
+        setDisplay("Error");
         setStep("IDLE");
         return;
-
-
       }
-      const realNumber = data.number.toString();
 
+      const realNumber = data.number.toString();
       setWinner(data);
 
-      // ⏳ SLOW DOWN EFFECT
+      // slowdown effect
       let slowdown = 0;
 
       const slowInterval = setInterval(() => {
-        slowdown += 1;
+        slowdown++;
 
         if (slowdown > 10) {
           clearInterval(interval);
           clearInterval(slowInterval);
 
-          // 🎬 REVEAL DIGITS ONE BY ONE
           setStep("REVEAL");
 
           let current = "";
@@ -149,75 +138,99 @@ else{
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="relative min-h-screen text-white overflow-hidden">
 
-      {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-3 bg-black border-b border-cyan-500 shadow-lg">
-<link rel="icon" href="/favicon.ico" />
-                <img src="/logos/cooperative.png" className="h-12" />
+      {/* 🖼 BACKGROUND */}
+      <div
+        className="absolute inset-0 bg-cover bg-[center_20%]"
+        style={{ backgroundImage: "url('/logos/backgrounda.jpg')" }}
+      />
 
+      {/* 🌑 OVERLAY */}
+      <div className="absolute inset-0 bg-black/60" />
 
-        <div className="flex gap-4">
-          <img src="/logos/usa-header-trans.png" className="h-12" />
-          <img src="/logos/mexico-header.webp" className="h-12" />
-          <img src="/logos/canada-header-trans.png" className="h-12" />
-        </div>
-<img src="/logos/visa.webp" className="h-12" />
-      </div>
+      {/* 🎬 CONTENT */}
+      <div className="relative z-10 flex flex-col min-h-screen">
 
-      {/* STAGE */}
-      <div className="flex-1 flex flex-col items-center justify-center">
+        {/* STAGE */}
+        <div className="flex-1 flex flex-col items-center justify-center">
 
-        <div className="text-cyan-500 mb-4 border-cyan-700 border px-4 py-1 rounded-full font-mono">
-          Draw {count } / {maxWinners}
+          {/* DRAW COUNTER */}
+          <div className="mb-6 px-6 py-2 rounded-full bg-white text-cyan-700 font-bold shadow border border-cyan-300">
+            Draw {count} / {maxWinners}
+          </div>
 
+          {count === maxWinners && (
+            <span className="mb-4 px-4 py-1 bg-red-600 text-white rounded-full shadow">
+              MAX WINNERS REACHED
+            </span>
+          )}
 
-        </div>
-       {count === maxWinners &&
-  <span className="text-red-500 ml-4">MAX WINNERS REACHED</span>
-}
-        {/* NUMBER */}
-        <motion.div
-          animate={{ scale: step === "SPINNING" ? 1.15 : 1 }}
-          className="text-7xl font-bold tracking-widest mb-10 text-cyan-400"
-        >
-          {display}
-        </motion.div>
-
-        {/* BUTTON */}
-        <button
-          onClick={startDraw}
-          disabled={step !== "IDLE" || count >= maxWinners}
-          className="bg-cyan-500 text-black px-10 py-4 rounded-full text-2xl font-bold disabled:opacity-40 hover:scale-105 transition"
-        >
-          🎯 START DRAW
-        </button>
-
-        {/* NEXT */}
-        {step === "CELEBRATION" && count < maxWinners - 1 && (
-          <button
-            onClick={nextDraw}
-            className="mt-6 bg-cyan-700 text-black px-8 py-3 rounded-full font-bold"
+          {/* NUMBER DISPLAY */}
+          <motion.div
+            animate={{ scale: step === "SPINNING" ? 1.15 : 1 }}
+            className="text-7xl font-extrabold tracking-widest mb-10 text-cyan-300 drop-shadow-[0_0_25px_rgba(34,211,238,0.9)]"
           >
-            ➡ NEXT DRAW
-          </button>
-        )}
+            {display}
+          </motion.div>
 
-        {/* HISTORY */}
-        <div className="mt-10 w-96 space-y-2">
-          {history.map((h) => (
-            <div
-              key={h.id}
-              className="bg-gray-900 border border-cyan-700 p-2 flex justify-between"
+          {/* 🎯 CIRCULAR DRAW BUTTON */}
+          <button
+            onClick={startDraw}
+            disabled={step !== "IDLE" || count >= maxWinners}
+            className="
+              w-40 h-40 rounded-full
+              flex items-center justify-center
+              text-xl font-bold text-cyan-500
+              bg-gradient-to-br from-white via-white to-cyan-700
+              text-black
+              shadow-[0_0_25px_rgba(0,211,238,0.8)]
+              border-4 border-black
+              hover:scale-110 hover:shadow-[0_0_40px_rgba(0,211,238,1)]
+              active:scale-95
+              transition-all duration-300
+              disabled:opacity-40
+            "
+          >
+            Start Draw
+          </button>
+
+          {/* NEXT BUTTON */}
+          {step === "CELEBRATION" && count < maxWinners - 1 && (
+            <button
+              onClick={nextDraw}
+              className="mt-6 bg-cyan-700 text-black px-8 py-3 rounded-full font-bold"
             >
-              <span>#{h.id}</span>
-              <span className="text-cyan-500">{h.number}</span>
+              ➡ NEXT DRAW
+            </button>
+          )}
+
+          {/* HISTORY */}
+          <div className="mt-10 w-[420px] space-y-2">
+
+            <div className="bg-white text-yellow-700 text-center font-bold p-3 rounded-t-xl shadow">
+              🎟 Winners
             </div>
-          ))}
+
+            <div className="bg-blue-900/80 backdrop-blur-md p-3 rounded-b-xl space-y-2 max-h-72 overflow-auto">
+              {history.map((h) => (
+                <div
+                  key={h.id}
+                  className="bg-white text-cyan-800 px-4 py-2 rounded-lg flex justify-between items-center shadow border-l-4 border-cyan-500"
+                >
+                  <span className="font-semibold">#{h.id}</span>
+                  <span className="font-mono tracking-wider">
+                    {h.number}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+          </div>
         </div>
       </div>
 
-      {/* CELEBRATION */}
+      {/* 🎉 CELEBRATION */}
       <AnimatePresence>
         {step === "CELEBRATION" && winner && (
           <Celebration winner={winner} onNext={nextDraw} />
