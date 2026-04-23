@@ -1,169 +1,158 @@
 import { motion } from "framer-motion";
 
-const floatingItems = [
-  "/logos/usa-header-trans.png",
-  "/logos/mexico-header.webp",
-  "/logos/canada-header-trans.png",
-  "/logos/cooperative.png",
-  "/logos/visa.png",
-  "/logos/worldcup.png",
-  "/logos/infinity.jpg",
-  "/logos/worldcup-sider.jpg",
-];
-
-const emojis = ["🎉", "🏆", "🎊", "✨", "🔥", "⚽", "💳"];
-
 export default function Celebration({ winner, onNext }) {
+  if (!winner) return null;
+
   return (
-    <div className="fixed inset-0 bg-black/90 overflow-hidden flex flex-col items-center">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 overflow-hidden text-white"
+    >
+      {/* 🖼 BACKGROUND */}
+      <div
+        className="absolute inset-0 bg-cover bg-[center_20%]"
+        style={{ backgroundImage: "url('/logos/backgroundb.jpg')" }}
+      />
 
-      {/* 🌌 BACKGROUND */}
-      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-yellow-500/10 to-green-500/10 animate-pulse" />
+      {/* 🎆 REALISTIC FIREWORKS */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
 
-      {/* 🏆 WINNER (UPPER CENTER) */}
-      <div className="text-center relative z-10 mt-20 px-4">
-
-        <h1 className="text-4xl text-orange-400 font-bold mb-4">
-          🎉🏆 WINNER SELECTED 🏆🎉
-        </h1>
-
-        <div className="text-7xl md:text-8xl font-extrabold text-cyan-400 tracking-widest">
-          {winner.number}
-        </div>
-
-        <div className="text-3xl text-orange-400 font-bold mt-4">
-          {winner.customerName}
-        </div>
-
-        <div className="text-xl text-orange-400 mt-4">
-          {winner.customerBranch}
-        </div>
-
-        <div className="text-xl text-orange-400 mt-4">
-          {winner.branchLocation}
-        </div>
-
-        <p className="text-gray-400 mt-4">
-          ⚽ World Cup Experience Package ⚽
-        </p>
-      </div>
-
-      {/* 🎉 EMOJI CELEBRATION */}
-      {Array.from({ length: 20 }).map((_, i) => {
-        const emoji = emojis[i % emojis.length];
-
-        return (
-          <motion.div
-            key={`emoji-${i}`}
-            className="absolute text-2xl"
+        {/* 🚀 Rockets */}
+        {[...Array(10)].map((_, i) => (
+          <span
+            key={`rocket-${i}`}
+            className="absolute text-xl"
             style={{
-              left: `${(i / 20) * 100}%`,
-              top: "-5%",
-            }}
-            animate={{
-              y: ["0%", "120vh"],
-              x: ["0%", `${(Math.random() - 0.5) * 200}px`],
-              rotate: [0, 360],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              delay: i * 0.2,
+              bottom: "0%",
+              left: `${Math.random() * 100}%`,
+              animation: `launch ${2 + Math.random()}s linear infinite`,
             }}
           >
-            {emoji}
-          </motion.div>
-        );
-      })}
+            🎇
+          </span>
+        ))}
 
-      {/* 🌍 LEFT FLOW */}
-      {floatingItems.map((src, i) => (
-        <motion.img
-          key={`left-${i}`}
-          src={src}
-          className="absolute w-16 opacity-80"
-          style={{ left: "-10%", top: "5%" }}
-          animate={{
-            x: ["0%", "110vw"],
-            y: ["0%", "120vh"],
-            rotate: 360,
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: 8 + Math.random() * 3,
-            repeat: Infinity,
-            delay: i * 0.4,
-          }}
-        />
-      ))}
-
-      {/* 🌍 CENTER FLOAT */}
-      {floatingItems.map((src, i) => (
-        <motion.img
-          key={`center-${i}`}
-          src={src}
-          className="absolute w-14 opacity-70"
-          style={{
-            left: "50%",
-            top: "5%",
-            transform: "translateX(-50%)",
-          }}
-          animate={{
-            y: ["0%", "120vh"],
-            x: ["0%", `${(Math.random() - 0.5) * 250}px`],
-            rotate: [0, 360],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: 12 + Math.random() * 8,
-            repeat: Infinity,
-            delay: i * 0.6,
-          }}
-        />
-      ))}
-
-      {/* 🌍 RIGHT FLOW */}
-      {floatingItems.map((src, i) => (
-        <motion.img
-          key={`right-${i}`}
-          src={src}
-          className="absolute w-16 opacity-80"
-          style={{ left: "110%", top: "5%" }}
-          animate={{
-            x: ["0%", "-110vw"],
-            y: ["0%", "120vh"],
-            rotate: 360,
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: 8 + Math.random() * 10,
-            repeat: Infinity,
-            delay: i * 0.1,
-          }}
-        />
-      ))}
-
-      {/* 🔻 BOTTOM AREA (NO OVERLAP) */}
-      <div className="absolute bottom-10 flex flex-col items-center gap-4 z-30">
-
-        {/* ⚽ WORLD CUP */}
-        <motion.img
-          src="/logos/worldcup.png"
-          className="w-44 "
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-        />
-
-        {/* NEXT BUTTON */}
-        <button
-          onClick={onNext}
-          className="bg-cyan-500 hover:bg-cyan-400 text-black px-8 py-3 rounded-full font-bold shadow-lg"
-        >
-          ➡ Next Draw
-        </button>
+        {/* 💥 Explosion */}
+        {[...Array(15)].map((_, i) => (
+          <span
+            key={`explode-${i}`}
+            className="absolute text-3xl"
+            style={{
+              top: `${20 + Math.random() * 50}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `explode ${1 + Math.random()}s ease-out infinite`,
+            }}
+          >
+            🎆
+          </span>
+        ))}
 
       </div>
-    </div>
+
+      {/* 🏆 CONTENT */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+
+        <div className="space-y-6 w-full max-w-2xl">
+
+          {/* FIELD ROW */}
+          <div className="flex items-center gap-4">
+            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+              🎱 Number
+            </label>
+            <input
+              value={winner.number}
+              readOnly
+              className="flex-1 p-3 rounded-lg bg-white text-black font-mono text-lg"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+              🎱 Name
+            </label>
+            <input
+              value={winner.customerName}
+              readOnly
+              className="flex-1 p-3 rounded-lg bg-white text-black"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+              🎱 Branch
+            </label>
+            <input
+              value={winner.customerBranch}
+              readOnly
+              className="flex-1 p-3 rounded-lg bg-white text-black"
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
+            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+              🎱 Location
+            </label>
+            <input
+              value={winner.branchLocation}
+              readOnly
+              className="flex-1 p-3 rounded-lg bg-white text-black"
+            />
+          </div>
+
+        </div>
+
+        {/* NEXT BUTTON */}
+        <div className="absolute bottom-10">
+          <button
+            onClick={onNext}
+            className="
+              bg-gradient-to-r from-green-400 to-cyan-500
+              text-black
+              px-12 py-4
+              rounded-full
+              font-bold
+              text-xl
+              shadow-lg
+              hover:scale-110
+              transition
+            "
+          >
+            ➡ NEXT DRAW
+          </button>
+        </div>
+      </div>
+
+      {/* 🎬 CUSTOM ANIMATIONS */}
+      <style>
+        {`
+          @keyframes launch {
+            0% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            80% {
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(-80vh);
+              opacity: 0;
+            }
+          }
+
+          @keyframes explode {
+            0% {
+              transform: scale(0.3);
+              opacity: 1;
+            }
+            100% {
+              transform: scale(1.5);
+              opacity: 0;
+            }
+          }
+        `}
+      </style>
+    </motion.div>
   );
 }
