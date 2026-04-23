@@ -152,7 +152,7 @@ else{
     <div className="min-h-screen bg-black text-white flex flex-col">
 
       {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-3 bg-black border-b border-cyan-500 shadow-lg">
+      <div className="flex items-center justify-between px-6 py-3 bg-cyan-700 border-b border-cyan-500 shadow-lg">
 <link rel="icon" href="/favicon.ico" />
                 <img src="/logos/cooperative.png" className="h-12" />
 
@@ -210,7 +210,7 @@ else{
               key={h.id}
               className="bg-gray-900 border border-cyan-700 p-2 flex justify-between"
             >
-              <span>#{h.id}</span>
+              <span className="text-cyan-500 bolder">#{h.id}</span>
               <span className="text-cyan-500">{h.number}</span>
             </div>
           ))}
