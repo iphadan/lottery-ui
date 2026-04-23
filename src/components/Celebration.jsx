@@ -40,7 +40,7 @@ export default function Celebration({ winner, onNext }) {
     >
       {/* 🖼 BACKGROUND */}
       <div
-        className="absolute inset-0 bg-cover bg-[center_20%]"
+        className="absolute inset-0 bg-cover bg-[center_16%]"
         style={{ backgroundImage: "url('/logos/backgroundb.jpg')" }}
       />
 
@@ -76,7 +76,7 @@ export default function Celebration({ winner, onNext }) {
       </div>
 
       {/* 🚀 LOGOS LAUNCHING FROM BOTTOM */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* <div className="absolute inset-0 pointer-events-none">
         {[
           "/logos/cooperative.png",
           "/logos/canada-header-trans.png",
@@ -97,17 +97,17 @@ export default function Celebration({ winner, onNext }) {
             }}
           />
         ))}
-      </div>
+      </div> */}
 
       {/* 🏆 CONTENT */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
+      <div className="relative z-10 flex flex-col items-center m-6 justify-center h-full px-4">
 
         <div className="space-y-6 w-full max-w-3xl">
 
           {/* NUMBER */}
           <div className="flex items-center gap-4">
             <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
-              🎱 Number
+              ⚽ Lottery No.
             </label>
             <input
               value={winner.number}
@@ -119,7 +119,7 @@ export default function Celebration({ winner, onNext }) {
           {/* NAME */}
           <div className="flex items-center gap-4">
             <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
-              🎱 Name
+              ⚽ Name
             </label>
             <input
               value={winner.customerName}
@@ -131,7 +131,7 @@ export default function Celebration({ winner, onNext }) {
           {/* BRANCH */}
           <div className="flex items-center gap-4">
             <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
-              🎱 Branch
+              ⚽ Branch
             </label>
             <input
               value={winner.customerBranch}
@@ -143,7 +143,7 @@ export default function Celebration({ winner, onNext }) {
           {/* LOCATION */}
           <div className="flex items-center gap-4">
             <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
-              🎱 Location
+              ⚽ Phone
             </label>
             <input
               value={winner.branchLocation}
