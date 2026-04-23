@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Celebration from "../components/Celebration";
 import {
@@ -9,14 +9,14 @@ import {
 
 export default function TVScreen() {
   const [session, setSession] = useState(null);
-
   const [step, setStep] = useState("IDLE");
   const [winner, setWinner] = useState(null);
   const [display, setDisplay] = useState("------------");
   const [history, setHistory] = useState([]);
   const [count, setCount] = useState(0);
 
-  // 🔄 LOAD SESSION + HISTORY
+  const spinAudioRef = useRef(null);
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -34,7 +34,7 @@ export default function TVScreen() {
           setHistory(formatted);
           setCount(formatted.length);
         }
-      } catch (e) {
+      } catch {
         console.error("Init failed");
       }
     };
@@ -44,7 +44,7 @@ export default function TVScreen() {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+      <div className="min-h-screen flex items-center justify-center bg-black text-white text-2xl">
         ⚠ No Active Session
       </div>
     );
@@ -52,11 +52,28 @@ export default function TVScreen() {
 
   const maxWinners = session.maxWinners;
 
-  // 🎯 DRAMATIC DRAW
+  // 🔊 SOUND CONTROL
+  const startSpinSound = () => {
+    const audio = new Audio("/sounds/spin.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+    spinAudioRef.current = audio;
+  };
+
+  const stopSpinSound = () => {
+    if (spinAudioRef.current) {
+      spinAudioRef.current.pause();
+      spinAudioRef.current.currentTime = 0;
+    }
+  };
+
+  // 🎯 DRAW
   const startDraw = async () => {
     if (step !== "IDLE" || count >= maxWinners) return;
 
     setStep("SPINNING");
+    startSpinSound();
 
     let interval = setInterval(() => {
       setDisplay(
@@ -68,8 +85,17 @@ export default function TVScreen() {
       const data = await drawWinner();
 
       if (!data?.number) {
-        clearInterval(interval);
+        if(data?.message === "No active session"){
+
+          setDisplay("No Active Session");
+        }
+        else{
         setDisplay("Error");
+
+
+        }
+        clearInterval(interval);
+        stopSpinSound();
         setStep("IDLE");
         return;
       }
@@ -77,13 +103,12 @@ export default function TVScreen() {
       const realNumber = data.number.toString();
       setWinner(data);
 
-      // slowdown effect
       let slowdown = 0;
 
       const slowInterval = setInterval(() => {
         slowdown++;
 
-        if (slowdown > 10) {
+        if (slowdown > 12) {
           clearInterval(interval);
           clearInterval(slowInterval);
 
@@ -96,15 +121,13 @@ export default function TVScreen() {
             current += realNumber[index];
             index++;
 
-            setDisplay(
-              current +
-                Math.floor(
-                  Math.random() *
-                    Math.pow(10, realNumber.length - current.length)
-                )
-                  .toString()
-                  .padStart(realNumber.length - current.length, "0")
-            );
+            // ✅ FIXED: no fake zeros
+            const remaining = Array.from(
+              { length: realNumber.length - current.length },
+              () => Math.floor(Math.random() * 10)
+            ).join("");
+
+            setDisplay(current + remaining);
 
             if (index === realNumber.length) {
               clearInterval(reveal);
@@ -117,20 +140,23 @@ export default function TVScreen() {
                   { id: count + 1, number: realNumber },
                 ]);
 
+                stopSpinSound(); // ✅ STOP ONLY HERE
                 setStep("CELEBRATION");
-              }, 600);
+              }, 800);
             }
-          }, 250);
+          }, 280);
         }
-      }, 150);
+      }, 140);
     } catch (e) {
       clearInterval(interval);
+      stopSpinSound();
       console.error(e);
       setStep("IDLE");
     }
   };
 
   const nextDraw = () => {
+    stopSpinSound();
     setStep("IDLE");
     setWinner(null);
     setDisplay("------------");
@@ -140,97 +166,74 @@ export default function TVScreen() {
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
 
-      {/* 🖼 BACKGROUND */}
+      {/* BACKGROUND */}
       <div
         className="absolute inset-0 bg-cover bg-[center_20%]"
         style={{ backgroundImage: "url('/logos/backgrounda.jpg')" }}
       />
 
-      {/* 🌑 OVERLAY */}
-      <div className="absolute inset-0 bg-black/60" />
-
-      {/* 🎬 CONTENT */}
       <div className="relative z-10 flex flex-col min-h-screen">
 
-        {/* STAGE */}
         <div className="flex-1 flex flex-col items-center justify-center">
 
           {/* DRAW COUNTER */}
-          <div className="mb-6 px-6 py-2 rounded-full bg-white text-cyan-700 font-bold shadow border border-cyan-300">
+          <div className="mb-6 px-8 py-3 rounded-full bg-white text-cyan-700 font-bold shadow-lg text-lg">
             Draw {count} / {maxWinners}
           </div>
 
-          {count === maxWinners && (
-            <span className="mb-4 px-4 py-1 bg-red-600 text-white rounded-full shadow">
-              MAX WINNERS REACHED
-            </span>
-          )}
-
-          {/* NUMBER DISPLAY */}
+          {/* NUMBER */}
           <motion.div
             animate={{ scale: step === "SPINNING" ? 1.15 : 1 }}
-            className="text-7xl font-extrabold tracking-widest mb-10 text-cyan-300 drop-shadow-[0_0_25px_rgba(34,211,238,0.9)]"
+            className="text-8xl font-extrabold tracking-widest mb-12 text-cyan-100 drop-shadow-[0_0_40px_rgba(34,211,238,0.9)]"
           >
             {display}
           </motion.div>
 
-          {/* 🎯 CIRCULAR DRAW BUTTON */}
-          <button
+          {/* GOLD BUTTON */}
+          <motion.button
             onClick={startDraw}
             disabled={step !== "IDLE" || count >= maxWinners}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.9 }}
             className="
-              w-40 h-40 rounded-full
-              flex items-center justify-center
-              text-xl font-bold text-cyan-500
-              bg-gradient-to-br from-white via-white to-cyan-700
-              text-black
-              shadow-[0_0_25px_rgba(0,211,238,0.8)]
-              border-4 border-black
-              hover:scale-110 hover:shadow-[0_0_40px_rgba(0,211,238,1)]
-              active:scale-95
-              transition-all duration-300
-              disabled:opacity-40
+              w-52 h-52 rounded-full flex flex-col items-center justify-center
+              bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600
+              border-[8px] border-yellow-100
+              shadow-[0_20px_60px_rgba(0,0,0,0.8),
+                      inset_0_10px_30px_rgba(255,255,255,0.9),
+                      inset_0_-10px_30px_rgba(180,120,0,0.7)]
+              text-black font-bold text-2xl
+              overflow-hidden disabled:opacity-40
             "
           >
-            Start Draw
-          </button>
-
-          {/* NEXT BUTTON */}
-          {step === "CELEBRATION" && count < maxWinners - 1 && (
-            <button
-              onClick={nextDraw}
-              className="mt-6 bg-cyan-700 text-black px-8 py-3 rounded-full font-bold"
-            >
-              ➡ NEXT DRAW
-            </button>
-          )}
+            <span>START</span>
+            <span className="text-sm opacity-80">DRAW</span>
+          </motion.button>
 
           {/* HISTORY */}
-          <div className="mt-10 w-[420px] space-y-2">
-
-            <div className="bg-white text-yellow-700 text-center font-bold p-3 rounded-t-xl shadow">
-              🎟 Winners
+          <div className="mt-12 w-[450px]">
+            <div className="bg-white text-cyan-600 text-center font-bold p-4 rounded-t-xl shadow-lg text-lg">
+              🏆 WINNERS
             </div>
 
-            <div className="bg-blue-900/80 backdrop-blur-md p-3 rounded-b-xl space-y-2 max-h-72 overflow-auto">
+            <div className="bg-blue-900/80 p-4 rounded-b-xl space-y-2 max-h-80 overflow-auto">
               {history.map((h) => (
                 <div
                   key={h.id}
-                  className="bg-white text-cyan-800 px-4 py-2 rounded-lg flex justify-between items-center shadow border-l-4 border-cyan-500"
+                  className="bg-white text-cyan-800 px-4 py-3 rounded-lg flex justify-between shadow border-l-4 border-cyan-500"
                 >
-                  <span className="font-semibold">#{h.id}</span>
-                  <span className="font-mono tracking-wider">
+                  <span className="font-bold">#{h.id}</span>
+                  <span className="font-mono tracking-widest text-lg">
                     {h.number}
                   </span>
                 </div>
               ))}
             </div>
-
           </div>
+
         </div>
       </div>
 
-      {/* 🎉 CELEBRATION */}
       <AnimatePresence>
         {step === "CELEBRATION" && winner && (
           <Celebration winner={winner} onNext={nextDraw} />

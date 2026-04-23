@@ -1,7 +1,35 @@
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 export default function Celebration({ winner, onNext }) {
+  const audioRef = useRef(null);
+
   if (!winner) return null;
+
+  // 🔊 START CELEBRATION SOUND
+  useEffect(() => {
+    const audio = new Audio("/sounds/celebration.mp3");
+    audio.loop = true;
+    audio.volume = 0.6;
+
+    audio.play().catch(() => {});
+    audioRef.current = audio;
+
+    return () => {
+      // 🛑 STOP SOUND WHEN COMPONENT UNMOUNTS
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, []);
+
+  const handleNext = () => {
+    // 🛑 STOP SOUND BEFORE NEXT DRAW
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    onNext();
+  };
 
   return (
     <motion.div
@@ -16,14 +44,12 @@ export default function Celebration({ winner, onNext }) {
         style={{ backgroundImage: "url('/logos/backgroundb.jpg')" }}
       />
 
-      {/* 🎆 REALISTIC FIREWORKS */}
+      {/* 🎆 FIREWORKS (ROCKET + EXPLOSION) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-
-        {/* 🚀 Rockets */}
-        {[...Array(10)].map((_, i) => (
+        {[...Array(12)].map((_, i) => (
           <span
-            key={`rocket-${i}`}
-            className="absolute text-xl"
+            key={i}
+            className="absolute text-2xl"
             style={{
               bottom: "0%",
               left: `${Math.random() * 100}%`,
@@ -34,13 +60,12 @@ export default function Celebration({ winner, onNext }) {
           </span>
         ))}
 
-        {/* 💥 Explosion */}
         {[...Array(15)].map((_, i) => (
           <span
-            key={`explode-${i}`}
+            key={`boom-${i}`}
             className="absolute text-3xl"
             style={{
-              top: `${20 + Math.random() * 50}%`,
+              top: `${20 + Math.random() * 60}%`,
               left: `${Math.random() * 100}%`,
               animation: `explode ${1 + Math.random()}s ease-out infinite`,
             }}
@@ -48,56 +73,82 @@ export default function Celebration({ winner, onNext }) {
             🎆
           </span>
         ))}
+      </div>
 
+      {/* 🚀 LOGOS LAUNCHING FROM BOTTOM */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[
+          "/logos/cooperative.png",
+          "/logos/canada-header-trans.png",
+          "/logos/visa.webp",
+          "/logos/infinity.png",
+          "/logos/worldcup-trans.png",
+          "/logos/usa-header-trans.png",
+          "/logos/mexico-header.webp",
+        ].map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            className="absolute h-12"
+            style={{
+              bottom: "0%",
+              left: `${Math.random() * 100}%`,
+              animation: `launch ${3 + Math.random()}s linear infinite`,
+            }}
+          />
+        ))}
       </div>
 
       {/* 🏆 CONTENT */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full px-4">
 
-        <div className="space-y-6 w-full max-w-2xl">
+        <div className="space-y-6 w-full max-w-3xl">
 
-          {/* FIELD ROW */}
+          {/* NUMBER */}
           <div className="flex items-center gap-4">
-            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
               🎱 Number
             </label>
             <input
               value={winner.number}
               readOnly
-              className="flex-1 p-3 rounded-lg bg-white text-black font-mono text-lg"
+              className="flex-1 p-4 rounded-lg bg-white text-black font-mono text-2xl font-extrabold tracking-widest"
             />
           </div>
 
+          {/* NAME */}
           <div className="flex items-center gap-4">
-            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
               🎱 Name
             </label>
             <input
               value={winner.customerName}
               readOnly
-              className="flex-1 p-3 rounded-lg bg-white text-black"
+              className="flex-1 p-4 rounded-lg bg-white text-black text-lg font-semibold"
             />
           </div>
 
+          {/* BRANCH */}
           <div className="flex items-center gap-4">
-            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
               🎱 Branch
             </label>
             <input
               value={winner.customerBranch}
               readOnly
-              className="flex-1 p-3 rounded-lg bg-white text-black"
+              className="flex-1 p-4 rounded-lg bg-white text-black text-lg"
             />
           </div>
 
+          {/* LOCATION */}
           <div className="flex items-center gap-4">
-            <label className="w-40 text-lg font-semibold text-black bg-white px-3 py-2 rounded-lg">
+            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
               🎱 Location
             </label>
             <input
               value={winner.branchLocation}
               readOnly
-              className="flex-1 p-3 rounded-lg bg-white text-black"
+              className="flex-1 p-4 rounded-lg bg-white text-black text-lg"
             />
           </div>
 
@@ -106,7 +157,7 @@ export default function Celebration({ winner, onNext }) {
         {/* NEXT BUTTON */}
         <div className="absolute bottom-10">
           <button
-            onClick={onNext}
+            onClick={handleNext}
             className="
               bg-gradient-to-r from-green-400 to-cyan-500
               text-black
@@ -114,7 +165,7 @@ export default function Celebration({ winner, onNext }) {
               rounded-full
               font-bold
               text-xl
-              shadow-lg
+              shadow-[0_0_25px_rgba(34,211,238,0.8)]
               hover:scale-110
               transition
             "
@@ -124,32 +175,17 @@ export default function Celebration({ winner, onNext }) {
         </div>
       </div>
 
-      {/* 🎬 CUSTOM ANIMATIONS */}
+      {/* 🎬 ANIMATIONS */}
       <style>
         {`
           @keyframes launch {
-            0% {
-              transform: translateY(0);
-              opacity: 1;
-            }
-            80% {
-              opacity: 1;
-            }
-            100% {
-              transform: translateY(-80vh);
-              opacity: 0;
-            }
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
           }
 
           @keyframes explode {
-            0% {
-              transform: scale(0.3);
-              opacity: 1;
-            }
-            100% {
-              transform: scale(1.5);
-              opacity: 0;
-            }
+            0% { transform: scale(0.3); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
           }
         `}
       </style>
