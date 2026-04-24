@@ -189,26 +189,24 @@ export default function TVScreen() {
             {display}
           </motion.div>
 
-          {/* GOLD BUTTON */}
-          <motion.button
-            onClick={startDraw}
-            disabled={step !== "IDLE" || count >= maxWinners}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.9 }}
-            className="
-              w-52 h-52 rounded-full flex flex-col items-center justify-center
-              bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600
-              border-[8px] border-yellow-100
-              shadow-[0_20px_60px_rgba(0,0,0,0.8),
-                      inset_0_10px_30px_rgba(255,255,255,0.9),
-                      inset_0_-10px_30px_rgba(180,120,0,0.7)]
-              text-black font-bold text-2xl
-              overflow-hidden disabled:opacity-40
-            "
-          >
-            <span>START</span>
-            <span className="text-sm opacity-80">DRAW</span>
-          </motion.button>
+         {/* 🎯 IMAGE BUTTON */}
+<motion.button
+  onClick={startDraw}
+  disabled={step !== "IDLE" || count >= maxWinners}
+  whileHover={{ scale: 1.06 }}
+  whileTap={{ scale: 0.92 }}
+  className="relative w-66 h-56 rounded-full overflow-hidden disabled:opacity-40"
+>
+  {/* BUTTON IMAGE */}
+  <img
+    src="/logos/start-btn.webp"
+    alt="Start Draw"
+    className="w-full h-full object-contain pointer-events-none"
+  />
+
+  {/* 🔥 OPTIONAL GLOW EFFECT (MEDIA TOUCH) */}
+  <div className="absolute inset-0 rounded-full shadow-[0_0_40px_rgba(34,211,238,0.6)]" />
+</motion.button>
 
           {/* HISTORY */}
           <div className="mt-12 w-[450px]">
@@ -216,14 +214,14 @@ export default function TVScreen() {
               🏆 WINNERS
             </div>
 
-            <div className="bg-blue-900/80 p-4 rounded-b-xl space-y-2 max-h-80 overflow-auto">
+            <div className="bg-cyan-900/80 p-2 rounded-b-xl text-lg font-bold space-y-2 max-h-80 overflow-auto">
               {history.map((h) => (
                 <div
                   key={h.id}
-                  className="bg-white text-cyan-800 px-4 py-3 rounded-lg flex justify-between shadow border-l-4 border-cyan-500"
+                  className="bg-white text-cyan-600 px-4 py-3 rounded-lg flex justify-between  border-l-8 border-cyan-400"
                 >
                   <span className="font-bold">#{h.id}</span>
-                  <span className="font-mono tracking-widest text-lg">
+                  <span className="font-mono tracking-widest text-2xl">
                     {h.number}
                   </span>
                 </div>
