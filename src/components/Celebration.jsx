@@ -112,7 +112,7 @@ export default function Celebration({ winner, onNext }) {
             <input
               value={winner.number}
               readOnly
-              className="flex-1 p-4 rounded-lg bg-white text-black font-mono text-2xl font-extrabold tracking-widest"
+              className="flex-1 p-4 w-44 rounded-lg bg-white text-black font text-3xl font-extrabold tracking-widest"
             />
           </div>
 
@@ -124,7 +124,7 @@ export default function Celebration({ winner, onNext }) {
             <input
               value={winner.customerName}
               readOnly
-              className="flex-1 p-4 rounded-lg bg-white text-black text-lg font-semibold"
+              className="flex-1 p-4 w-44 rounded-lg bg-white text-black text-lg font-semibold"
             />
           </div>
 
@@ -136,7 +136,7 @@ export default function Celebration({ winner, onNext }) {
             <input
               value={winner.customerBranch}
               readOnly
-              className="flex-1 p-4 rounded-lg bg-white text-black text-lg"
+              className="flex-1  p-4 rounded-lg bg-white text-black text-lg"
             />
           </div>
 
