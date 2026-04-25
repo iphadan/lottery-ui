@@ -17,6 +17,7 @@ export default function TVScreen() {
 
   const spinAudioRef = useRef(null);
 
+  // 🔄 LOAD SESSION
   useEffect(() => {
     const load = async () => {
       try {
@@ -42,6 +43,33 @@ export default function TVScreen() {
     load();
   }, []);
 
+  // ⚠️ WAIT UNTIL SESSION EXISTS
+  const maxWinners = session?.maxWinners || 0;
+
+  // 🎹 KEYBOARD CONTROL (SPACE + ENTER)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // SPACE → START DRAW
+      if (e.code === "Space") {
+        e.preventDefault();
+
+        if (step === "IDLE" && count < maxWinners) {
+          startDraw();
+        }
+      }
+
+      // ENTER → NEXT DRAW
+      if (e.code === "Enter") {
+        if (step === "CELEBRATION") {
+          nextDraw();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [step, count, maxWinners]); // ✅ SAFE DEPENDENCIES
+
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white text-2xl">
@@ -49,8 +77,6 @@ export default function TVScreen() {
       </div>
     );
   }
-
-  const maxWinners = session.maxWinners;
 
   // 🔊 SOUND CONTROL
   const startSpinSound = () => {
@@ -85,15 +111,11 @@ export default function TVScreen() {
       const data = await drawWinner();
 
       if (!data?.number) {
-        if(data?.message === "No active session"){
-
-          setDisplay("No Active Session");
-        }
-        else{
-        setDisplay("Error");
-
-
-        }
+        setDisplay(
+          data?.message === "No active session"
+            ? "No Active Session"
+            : "Error"
+        );
         clearInterval(interval);
         stopSpinSound();
         setStep("IDLE");
@@ -121,7 +143,6 @@ export default function TVScreen() {
             current += realNumber[index];
             index++;
 
-            // ✅ FIXED: no fake zeros
             const remaining = Array.from(
               { length: realNumber.length - current.length },
               () => Math.floor(Math.random() * 10)
@@ -140,7 +161,7 @@ export default function TVScreen() {
                   { id: count + 1, number: realNumber },
                 ]);
 
-                stopSpinSound(); // ✅ STOP ONLY HERE
+                stopSpinSound();
                 setStep("CELEBRATION");
               }, 800);
             }
@@ -168,7 +189,7 @@ export default function TVScreen() {
 
       {/* BACKGROUND */}
       <div
-        className="absolute inset-0 bg-cover bg-[center_20%]"
+        className="absolute inset-0 bg-contain bg-center bg-no-repeat bg-black"
         style={{ backgroundImage: "url('/logos/backgrounda.jpg')" }}
       />
 
@@ -181,6 +202,12 @@ export default function TVScreen() {
             Draw {count} / {maxWinners}
           </div>
 
+          {maxWinners === count && (
+            <div className="mt-1 px-8 py-3 text-red-500 font-bold text-3xl">
+              Max Draw Reached
+            </div>
+          )}
+
           {/* NUMBER */}
           <motion.div
             animate={{ scale: step === "SPINNING" ? 1.15 : 1 }}
@@ -189,27 +216,33 @@ export default function TVScreen() {
             {display}
           </motion.div>
 
-         {/* 🎯 IMAGE BUTTON */}
-<motion.button
-  onClick={startDraw}
-  disabled={step !== "IDLE" || count >= maxWinners}
-  whileHover={{ scale: 1.06 }}
-  whileTap={{ scale: 0.92 }}
-  className="relative w-66 h-56 rounded-full overflow-hidden disabled:opacity-40"
->
-  {/* BUTTON IMAGE */}
-  <img
-    src="/logos/start-btn.webp"
-    alt="Start Draw"
-    className="w-full h-full object-contain pointer-events-none"
-  />
+          {/* BUTTON */}
+          <motion.button
+            onClick={startDraw}
+            disabled={step !== "IDLE" || count >= maxWinners}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.92 }}
+            className="relative w-66 h-56 rounded-full overflow-hidden disabled:opacity-40"
+          >
+            <img
+              src="/logos/start-btn.webp"
+              alt="Start Draw"
+              className="w-full h-full object-contain pointer-events-none"
+            />
 
-  {/* 🔥 OPTIONAL GLOW EFFECT (MEDIA TOUCH) */}
-  <div className="absolute inset-0 rounded-full shadow-[0_0_40px_rgba(34,211,238,0.6)]" />
-</motion.button>
+            <div className="absolute inset-0 rounded-full shadow-[0_0_40px_rgba(34,211,238,0.6)]" />
+          </motion.button>
 
           {/* HISTORY */}
-          <div className="mt-12 w-[450px]">
+          <div className="mt-6 w-[550px]">
+
+            {/* SLOGAN */}
+            <div className="absolute left-14 top-[55%] -translate-y-1/2 hidden lg:block">
+              <div className="text-orange-500 text-2xl font-extrabold">
+                Bank Smarter, Live Better!
+              </div>
+            </div>
+
             <div className="bg-white text-cyan-600 text-center font-bold p-4 rounded-t-xl shadow-lg text-lg">
               🏆 WINNERS
             </div>
@@ -218,7 +251,7 @@ export default function TVScreen() {
               {history.map((h) => (
                 <div
                   key={h.id}
-                  className="bg-white text-cyan-600 px-4 py-3 rounded-lg flex justify-between  border-l-8 border-cyan-400"
+                  className="bg-white text-cyan-600 px-4 py-3 rounded-lg flex justify-between border-l-8 border-cyan-400"
                 >
                   <span className="font-bold">#{h.id}</span>
                   <span className="font-mono tracking-widest text-2xl">
@@ -232,6 +265,7 @@ export default function TVScreen() {
         </div>
       </div>
 
+      {/* CELEBRATION */}
       <AnimatePresence>
         {step === "CELEBRATION" && winner && (
           <Celebration winner={winner} onNext={nextDraw} />

@@ -40,7 +40,7 @@ export default function Celebration({ winner, onNext }) {
     >
       {/* 🖼 BACKGROUND */}
       <div
-        className="absolute inset-0 bg-cover bg-[center_16%]"
+className="absolute inset-0 bg-contain bg-center bg-no-repeat bg-black"
         style={{ backgroundImage: "url('/logos/backgroundb.jpg')" }}
       />
 
@@ -59,6 +59,19 @@ export default function Celebration({ winner, onNext }) {
             🎇
           </span>
         ))}
+          {[...Array(12)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute text-2xl"
+            style={{
+              bottom: "0%",
+              left: `${Math.random() * 100}%`,
+              animation: `launch ${2 + Math.random()}s linear infinite`,
+            }}
+          >
+            🎊
+          </span>
+        ))}
 
         {[...Array(15)].map((_, i) => (
           <span
@@ -70,7 +83,46 @@ export default function Celebration({ winner, onNext }) {
               animation: `explode ${1 + Math.random()}s ease-out infinite`,
             }}
           >
+          💥
+          </span>
+        ))}
+          {[...Array(15)].map((_, i) => (
+          <span
+            key={`boom-${i}`}
+            className="absolute text-3xl"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `explode ${1 + Math.random()}s ease-out infinite`,
+            }}
+          >
+          🌟
+          </span>
+        ))}
+            {[...Array(15)].map((_, i) => (
+          <span
+            key={`boom-${i}`}
+            className="absolute text-3xl"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `explode ${1 + Math.random()}s ease-out infinite`,
+            }}
+          >
             🎆
+          </span>
+        ))}
+           {[...Array(15)].map((_, i) => (
+          <span
+            key={`boom-${i}`}
+            className="absolute text-3xl"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `explode ${1 + Math.random()}s ease-out infinite`,
+            }}
+          >
+            🎉
           </span>
         ))}
       </div>
@@ -106,54 +158,68 @@ export default function Celebration({ winner, onNext }) {
 
           {/* NUMBER */}
           <div className="flex items-center gap-4">
-            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
+            <label className="w-44 text-lg font-bold text-orange-500 bg-white px-3 py-3 rounded-lg">
               ⚽ Lottery No.
             </label>
             <input
               value={winner.number}
               readOnly
-              className="flex-1 p-4 w-44 rounded-lg bg-white text-black font text-3xl font-extrabold tracking-widest"
+              className="flex-1 p-4 w-44 rounded-lg bg-white text-orange-500 font text-3xl font-extrabold tracking-widest"
             />
           </div>
 
           {/* NAME */}
           <div className="flex items-center gap-4">
-            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
+            <label className="w-44 text-lg font-bold text-orange-500 bg-white px-3 py-3 rounded-lg">
               ⚽ Name
             </label>
             <input
               value={winner.customerName}
               readOnly
-              className="flex-1 p-4 w-44 rounded-lg bg-white text-black text-lg font-semibold"
+              className="flex-1 p-4 w-44 rounded-lg bg-white text-orange-500 text-lg font-semibold"
             />
           </div>
 
           {/* BRANCH */}
           <div className="flex items-center gap-4">
-            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
+            <label className="w-44 text-lg font-bold text-orange-500 bg-white px-3 py-3 rounded-lg">
               ⚽ Branch
             </label>
             <input
               value={winner.customerBranch}
               readOnly
-              className="flex-1  p-4 rounded-lg bg-white text-black text-lg"
+              className="flex-1  p-4 rounded-lg bg-white text-orange-500 text-lg"
             />
           </div>
 
           {/* LOCATION */}
-          <div className="flex items-center gap-4">
-            <label className="w-44 text-lg font-bold text-black bg-white px-3 py-3 rounded-lg">
+          {/* <div className="flex items-center gap-4">
+            <label className="w-44 text-lg font-bold text-orange-500 bg-white px-3 py-3 rounded-lg">
               ⚽ Phone
             </label>
             <input
               value={winner.branchLocation}
               readOnly
-              className="flex-1 p-4 rounded-lg bg-white text-black text-lg"
+              className="flex-1 p-4 rounded-lg bg-white text-orange-500 text-lg"
             />
-          </div>
+          </div> */}
 
         </div>
-
+<div className="
+  absolute left-50%
+  top-[75%] -translate-y-1/2
+  hidden lg:block
+">
+  <div className="
+    text-black
+    text-3xl 
+    font-extrabold 
+    tracking-wide 
+    leading-snug
+  ">
+    Bank Smarter, Live Better!
+  </div>
+</div>
         {/* NEXT BUTTON */}
         <div className="absolute bottom-10">
           <button

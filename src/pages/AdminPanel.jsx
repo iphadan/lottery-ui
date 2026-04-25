@@ -123,7 +123,7 @@ if (!sessionData || !sessionData.id) {
         </div>
       )}
 
-      <div className="p-8 grid grid-cols-3 gap-6">
+      <div className="p-8 grid grid-cols-3 gap-2">
 
         {/* UPLOAD */}
         <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
@@ -175,7 +175,7 @@ if (!sessionData || !sessionData.id) {
         </div>
 
         {/* WINNERS */}
-        <div className="bg-gray-900 p-6 rounded-xl border border-cyan-700">
+        <div className="bg-gray-900 p-2 rounded-xl border border-cyan-700">
           <h2 className="text-cyan-400 font-bold mb-4">
             Winners
           </h2>
@@ -186,7 +186,7 @@ if (!sessionData || !sessionData.id) {
             winners.map((w) => (
               <div
                 key={w.id}
-                className={`flex justify-between p-2 rounded mb-1 border ${
+                className={`flex justify-between p-1 rounded mb-1 border ${
                   w.lotteryNumber?.isUsed
                     ? "bg-yellow-400 text-black border-yellow-500"
                     : "bg-black border-cyan-800"
@@ -195,7 +195,11 @@ if (!sessionData || !sessionData.id) {
                 <span className="font-bold">
                   {w.lotteryNumber?.number}
                 </span>
+                   <span>{w.lotteryNumber?.branchLocation}</span>
+
                 <span>{w.lotteryNumber?.customerName}</span>
+
+                
               </div>
             ))
           )}
@@ -248,6 +252,8 @@ if (!sessionData || !sessionData.id) {
                   >
                     <span className="font-bold">{p.number}</span>
                     <span className="text-sm">{p.customerName}</span>
+                                        <span className="text-sm">{p.branchLocation}</span>
+
                   </div>
                 ))}
 
